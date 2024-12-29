@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy New Year!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+  
+  <style>
+    /* --- BASIC PAGE STYLING --- */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #000;
+      color: #fff;
+      overflow: hidden; /* Prevent scrollbars from fireworks/spaces */
+    }
+
+    /* Container for countdown numbers (3,2,1) */
+    .container {
+      position: relative;
+      z-index: 10; /* Above fireworks and stars */
+    }
+
+    /* The text that shows "3", then "2", then "1" with a zoom effect */
+    #countdown {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0vw; /* initial to animate from 0 to 100vw */
+      color: #fff;
+      opacity: 1;
+    }
+    @keyframes countdownZoom {
+      0% {
+        font-size: 0vw;
+        opacity: 1;
+      }
+      100% {
+        font-size: 100vw;
+        opacity: 0;
+      }
+    }
+
+    #personalized-message img {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    /* --- GREETING TEXT --- */
+    #greeting {
+      font-size: 2.5rem;
+      text-align: center;
+      display: none;
+      margin-top: 20px;
+      z-index: 10;
+      animation: fadeIn 1s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- QUOTE SECTION --- */
+    #personalized-message {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #FFD700; /* Gold color for a festive touch */
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+      margin-bottom: 20px;
+    }
+
+    /* --- QUOTE SECTION --- */
+    #quote {
+      font-size: 1.2rem;
+      font-style: italic;
+      color: #FFFFFF;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 0;
+      border-radius: 15px;
+      max-width: 80%;
+      margin: 20px 0 0 0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      line-height: 1.5;
+    }
+
+    #signature {
+      font-family: 'Great Vibes', cursive; /* Handwritten Font */
+      font-size: 2.5rem;                   /* Adjust size as needed */
+      color: #FFD700;                      /* Light Gold Color */
+      text-align: center;                  /* Center alignment */
+      margin-top: 0px;                     /* Space above the signature */
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    }
+
+    /* --- IMAGE SECTION --- */
+    #image-container {
+      width: 90%;
+      max-width: 500px;
+      max-height: 300px;
+    }
+
+    #image-container img {
+      width: 60%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    #image-container img:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+
+    /* --- RESPONSIVE DESIGN --- */
+    @media (max-width: 768px) {
+      #personalized-message {
+        font-size: 2.5rem;
+      }
+      #quote {
+        font-size: 1.4rem;
+        padding: 15px 20px;
+      }
+      #image-container {
+        width: 90%;
+        max-width: 500px;
+        max-height: 300px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #personalized-message {
+        font-size: 2rem;
+      }
+      #quote {
+        font-size: 1.2rem;
+        padding: 10px 15px;
+      }
+      #image-container {
+        width: 95%;
+        max-width: 400px;
+        max-height: 250px;
+      }
+    }
+
+    /* --- USER INPUT SECTION --- */
+    #user-input {
+      display: none;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      margin-top: 20px;
+      z-index: 10;
+    }
+    #user-input input {
+      padding: 10px;
+      font-size: 1rem;
+      margin-right: 10px;
+      width: 70%;
+      box-sizing: border-box;
+      border: none;
+      border-radius: 5px;
+    }
+    #user-input button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: #ff9800;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    #user-input button:hover {
+      background: #e68900;
+    }
+
+    /* --- FIREWORKS CANVAS(S) AREA --- */
+    #fireworks {
+      z-index: 5; /* Above stars but behind text elements */
+    }
+    canvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* --- TWINKLING STARS (lowest layer) --- */
+    #space {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;  /* So star <div> can't scroll out of view */
+      z-index: 10;       /* Below fireworks and text */
+      pointer-events: none; /* Allow clicks to pass through */
+    }
+
+    /* --- STAR BLINK CSS --- */
+    .star-blink {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      background-color: #b6cbd4;
+      clip-path: polygon(
+        50% 0%,
+        61% 35%,
+        98% 35%,
+        68% 57%,
+        79% 91%,
+        50% 70%,
+        21% 91%,
+        32% 57%,
+        2% 35%,
+        39% 35%
+      );
+      z-index: 10;
+      transform: rotate(0deg) scale(0.08);
+      backface-visibility: hidden;
+      animation: blinkAfter 15s infinite ease-out, rotateStar 15s infinite linear;
+    }
+
+    .star-blink div {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      transform: rotate(45deg) scale(0.75);
+      box-shadow: 
+        0 0 2px 8px rgba(0,0,0,0.4),
+        0 0 2px 9px rgba(255,255,255,0.07),
+        0 0 2px 15px rgba(0,0,0,0.4), 
+        0 0 2px 16px rgba(255,255,255,0.1);
+      backface-visibility: hidden;
+    }
+
+    .star-blink.red div {
+      box-shadow: 0 0 25px rgba(255,0,0,1);
+    }
+    .star-blink.blue div {
+      box-shadow: 0 0 25px rgba(0,0,255,1);
+    }
+
+    @keyframes blinkAfter {
+      0% {
+        transform: rotate(0deg) scale(0.08);
+      }
+      4% {
+        transform: rotate(-20deg) scale(0.9);
+      }
+      8% {
+        transform: rotate(-40deg) scale(0.08);	
+      }
+      50% {
+        transform: rotate(-40deg) scale(0.08);
+      }
+      52% {
+        transform: rotate(-50deg) scale(0.3);
+      }
+      54% {
+        transform: rotate(-60deg) scale(0.08);
+      } 
+      100% {
+        transform: rotate(0deg) scale(0.08);	
+      }
+    }
+
+    @keyframes rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);	
+      }
+    }
+
+
+    
+
+    /* General Styles */
+
+
+/* Main Container */
+
+
+/* Header Section */
+.header h1 {
+  
+  margin-bottom: 30px;
+   font-size: 2.5rem;
+   font-weight: bold;
+      color: #ffcb42; /* Light Gold Color */
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      
+
+}
+@keyframes bounce {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-10px);
+  }
+}
+
+
+.header p {
+  font-size: 16px;
+  margin: 0 0 20px; /* Space below the header */
+  color: #cccccc; /* Softer gray for subtext */
+}
+
+/* Main Section */
+.main p {
+  font-size: 18px;
+  margin: 20px 0; /* Space around instruction */
+  color: #dddddd; /* Bright for emphasis */
+}
+
+#reveal-button {
+background: linear-gradient(to right, #ff7e5f, #feb47b); /* Orange gradient */
+  border: none;
+  border-radius: 25px;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  color: #1a1a40  ;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  animation: bounce 1s infinite;
+  
+}
+
+#reveal-button:hover {
+  background-color: #e65c50;
+  transform: scale(1.05); /* Slight lift */
+}
+
+
+
+
+
+
+
+
+/* Footer Section */
+ .footer {
+      
+      text-align: center;
+      
+      padding: 15px;
+      
+      font-size: 0.6rem;
+  color: #dcdcdc;
+
+    }
+    .footer p {
+      margin: 0;
+    }
+
+ 
+
+    /* --- HEADER, MAIN INTERACTION, AND FOOTER CONTAINER --- */
+    #container1 {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      z-index: 10; /* Above fireworks and stars */
+      animation: fadeIn 1s ease-in-out forwards;
+      opacity: 0;
+      max-width: 400px;
+  padding: 30px 20px 0px 20px;
+  
+  flex-direction: column; /* Arrange elements vertically */
+  justify-content: space-between; /* Push header to the top and footer to the bottom */
+  height: 100%; /* Ensure container spans the full height */
+    }
+
+    
+
+  
+
+  
+
+  
+
+    
+
+  </style>
+</head>
+
+<body>
+  <!-- Container for twinkling stars (background) -->
+  <div id="space"></div>
+
+  <!-- Container for countdown numbers -->
+  <div class="container"></div>
+
+  <!-- Greeting text after countdown / fireworks -->
+  <div id="greeting">
+    <div id="personalized-message">
+      <img src="happyNewYear.avif" alt="Happy New Year">
+    </div>
+    
+    <div id="image-container">
+      <img id="image" src="" alt="Celebration Image">
+    </div>
+    <div id="quote"></div>
+    <div id="signature"></div>
+  </div>
+
+  <!-- User input section (Name input + button + share link) -->
+  <div id="user-input">
+    <input type="text" id="name" id="name" placeholder="Enter your name">
+    <button onclick="redirect()">Go</button>
+    
+  </div>
+
+  <!-- Fireworks container (dynamic canvases inside) -->
+  <div id="fireworks"></div>
+
+  <!-- jQuery - needed for code in app.js -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Main logic (countdown, fireworks, stars, etc.) -->
+  <script src="app.js"></script>
+  <script src="share.js"></script>
+
+
+
+
+  <div class="container1" id="container1">
+    <div class="header">
+      <h1>[Sender’s Name]!</h1>
+      <p>New Year surprise, just for you 💌</p>
+    </div>
+
+    <div class="main">
+      <p>Tap below to see your surprise</p>
+      <div class="button-container">
+        <button id="reveal-button">View My Surprise</button>
+      </div>
+      
+    </div>
+
+    <div class="footer">
+      <p>Your surprise is secure. ❤️</p>
+    </div>
+  </div>
+
+
+
+
+
+
+</body>
+</html>
