@@ -49,9 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
     // Construct WhatsApp share URL
  
-  const whatsappURL = `https://api.whatsapp.com/send?text=*Hi!*%0A%0AI%E2%80%99ve%20made%20a%20*special%20surprise*%20to%20make%20your%20*New%20Year*%20amazing%20%F0%9F%8E%89%0A%0ATap%20this%20*secure%20link*%20to%20see%20it%3A%0Abenadin.github.io%2FCustomWish%2F%3Fn%3D${encodeURIComponent(str1.replace(/ /g, '%20'))}`;
+  const str2 =str1.trim();
+  const whatsappURL = `https://api.whatsapp.com/send?text=*Hi!*%0A%0AI%E2%80%99ve%20made%20a%20*special%20surprise*%20to%20make%20your%20*New%20Year*%20amazing%20%F0%9F%8E%89%0A%0ATap%20this%20*secure%20link*%20to%20see%20it%3A%0Abenadin.github.io%2FCustomWish%2F%3Fn%3D${encodeURIComponent(str2.replace(/ /g, '%20'))}`;
 
-  
 
   
     // Add click event listener to the share button
