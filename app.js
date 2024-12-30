@@ -388,7 +388,7 @@ function showGreeting() {
 // 7. Twinkling Stars
 // --------------------------------------------
 function startTwinklingStars() {
-  let amount = 1000;
+  let amount = 100;
   const sky = $('#space');
 
   for (let i = 0; i < amount; i++) {
